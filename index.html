@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>강산의 폰</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1012;--card:#1b1c1f;--card2:#26272b;--ln:#2e3034;--tx:#ececec;--sub:#9a9a9f;--fa:#6c6c72;--bl:#3a8cff;--yl:#fee500;--rd:#ff453a;--gn:#30d158;--or:#ff9f0a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#050506}
+body{font-family:'Noto Sans KR',-apple-system,sans-serif;color:var(--tx);font-size:14px;letter-spacing:-.02em;display:flex;align-items:center;justify-content:center;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.phone{position:relative;width:100%;height:100%;max-width:420px;max-height:880px;background:var(--bg);overflow:hidden}
+@media(min-width:500px){.phone{border-radius:46px;border:10px solid #1c1c1e;box-shadow:0 30px 80px rgba(0,0,0,.7);height:92vh}}
+.screen{position:absolute;inset:0;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .35s}
+.hidden{opacity:0;pointer-events:none}
+.sb{position:absolute;left:0;right:0;top:0;height:40px;display:flex;justify-content:space-between;align-items:center;padding:6px 22px 0;font-size:14px;font-weight:700;color:#fff;z-index:50;pointer-events:none}
+.sb .r{display:flex;align-items:center;gap:6px;font-size:12px}
+.bat{display:inline-flex;width:25px;height:12px;border:1px solid rgba(255,255,255,.75);border-radius:3px;padding:1px}
+.bat i{display:block;height:100%;width:14%;background:var(--rd);border-radius:1px;animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.35}}
+
+/* lock */
+#lock{background:#000;z-index:30}
+#lock img.wp{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;filter:brightness(.75)}
+#lock .dim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0) 30%,rgba(0,0,0,.15) 55%,rgba(0,0,0,.75))}
+.clk{position:absolute;left:0;right:0;top:62px;text-align:center;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.4)}
+.clk .d{font-size:16px;font-weight:500}
+.clk .t{font-size:84px;font-weight:300;line-height:1.05}
+.ntf{position:absolute;left:12px;right:12px;bottom:70px}
+.nt{display:flex;gap:10px;background:rgba(38,38,42,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:18px;padding:11px 13px;margin-top:8px;color:#fff;animation:up .6s ease both}
+.nt:nth-child(2){animation-delay:.15s}.nt:nth-child(3){animation-delay:.3s}.nt:nth-child(4){animation-delay:.45s}
+.nt .ic{flex:none;width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.nt .bd{flex:1;min-width:0}
+.nt .hd{display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.65)}
+.nt b{display:block;font-size:14px}
+.nt .m{display:block;font-size:13px;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.swipe{position:absolute;left:0;right:0;bottom:18px;text-align:center;font-size:13px;color:rgba(255,255,255,.8)}
+.swipe:before{content:"";display:block;width:130px;height:5px;border-radius:3px;background:rgba(255,255,255,.85);margin:0 auto 8px;animation:hint 1.8s ease-in-out infinite}
+@keyframes hint{50%{transform:translateY(-6px)}}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* passcode */
+#pass{z-index:35;background:rgba(10,10,12,.55);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);display:flex;flex-direction:column;align-items:center;padding-top:110px;color:#fff}
+#pass .tt{font-size:18px;font-weight:500}
+#pass .hint{font-size:13px;color:rgba(255,255,255,.6);margin-top:6px;height:18px}
+.dots{display:flex;gap:18px;margin:26px 0 40px}
+.dots i{width:14px;height:14px;border-radius:50%;border:1.5px solid #fff}
+.dots i.on{background:#fff}
+.dots.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+.pad{display:grid;grid-template-columns:repeat(3,78px);gap:16px 26px}
+.pad button{width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.14);font-size:30px;font-weight:300;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.pad button small{font-size:10px;letter-spacing:.15em;margin-top:2px;opacity:.8}
+.pad button:active{background:rgba(255,255,255,.4)}
+.pad .em{background:none}
+#pass .cancel{position:absolute;bottom:34px;right:44px;font-size:16px}
+
+/* home */
+#home{background:radial-gradient(circle at 15% 0%,#2b2f3a,transparent 55%),radial-gradient(circle at 95% 35%,#2d2520,transparent 50%),#111215;padding-top:46px;overflow-y:auto}
+.wid{margin:10px 18px 6px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.wid>div{background:rgba(255,255,255,.08);border-radius:22px;padding:14px 16px}
+.wid .k{display:block;font-size:12px;color:var(--sub)}
+.wid .v{display:block;font-size:26px;font-weight:700;line-height:1.25}
+.wid .s{display:block;font-size:12px;color:var(--sub)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px 0;padding:18px 10px}
+.app{display:flex;flex-direction:column;align-items:center;gap:6px}
+.ico{position:relative;width:60px;height:60px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:29px;box-shadow:0 4px 10px rgba(0,0,0,.35);transition:transform .15s}
+.app:active .ico{transform:scale(.88)}
+.app span.lb{font-size:12px;color:#eee}
+.bdg{position:absolute;top:-6px;right:-7px;min-width:21px;height:21px;border-radius:11px;background:var(--rd);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 6px}
+.dock{position:absolute;left:12px;right:12px;bottom:26px;background:rgba(255,255,255,.1);backdrop-filter:blur(16px);border-radius:30px;padding:12px 0;display:flex;justify-content:space-around}
+.homebar{position:absolute;left:50%;bottom:8px;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:rgba(255,255,255,.75);z-index:60;cursor:pointer}
+
+/* app view */
+.view{background:var(--bg);z-index:20;transform:translateX(100%);display:flex;flex-direction:column}
+.view.open{transform:none}
+.nav{flex:none;display:flex;align-items:center;gap:6px;padding:46px 12px 10px;border-bottom:1px solid var(--ln);background:rgba(15,16,18,.95)}
+.nav .back{font-size:26px;color:var(--bl);width:34px;line-height:1}
+.nav b{font-size:18px;font-weight:700}
+.nav .rt{margin-left:auto;font-size:13px;color:var(--bl)}
+.body{flex:1;overflow-y:auto;padding:6px 16px 60px}
+.row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--ln);cursor:pointer}
+.row:last-child{border-bottom:0}
+.av{flex:none;width:46px;height:46px;border-radius:17px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff}
+.row .c{flex:1;min-width:0}
+.row .c b{display:block;font-size:15px}
+.row .c span{display:block;font-size:13px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .rt{flex:none;text-align:right;font-size:12px;color:var(--fa)}
+.row .rt i{display:inline-block;font-style:normal;background:var(--rd);color:#fff;border-radius:10px;padding:0 7px;font-weight:700;margin-top:3px}
+.miss{color:var(--rd)!important}
+
+/* chat */
+.chat{background:#9bbbd4;color:#1b1b1b}
+.chat .nav{background:#9bbbd4;border-color:rgba(0,0,0,.08);color:#1b1b1b}
+.chat .nav .back{color:#1b1b1b}
+.chat .body{padding:10px 12px 70px}
+.day{text-align:center;margin:8px 0 12px}
+.day span{display:inline-block;background:rgba(0,0,0,.18);color:#fff;font-size:12px;border-radius:12px;padding:2px 12px}
+.cm{display:flex;gap:7px;margin-bottom:8px;animation:up .35s ease both}
+.cm .a{flex:none;width:38px;height:38px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.cm .n{display:block;font-size:12px;color:#34434f;margin-bottom:2px}
+.cm .b{display:inline-block;background:#fff;border-radius:3px 14px 14px 14px;padding:7px 11px;font-size:14px;max-width:100%;line-height:1.45}
+.cm.me{justify-content:flex-end}
+.cm.me .b{background:var(--yl);border-radius:14px 3px 14px 14px}
+.cm .tm{align-self:flex-end;font-size:11px;color:#4f5d69;white-space:nowrap}
+.cm .tm i{font-style:normal;color:#e0a400;font-weight:700;margin-right:2px}
+.cm .ph{width:170px;height:200px;border-radius:12px;background:linear-gradient(160deg,#e8cfa9,#b98a5e);display:flex;align-items:flex-end;padding:8px;color:#fff;font-size:12px;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.inp{position:absolute;left:0;right:0;bottom:0;background:#fff;display:flex;align-items:center;gap:8px;padding:8px 10px 22px;color:#999;font-size:14px}
+.inp div{flex:1;background:#f2f2f2;border-radius:18px;padding:8px 12px}
+
+/* contact */
+.me{text-align:center;padding:18px 0 10px}
+.me .big{width:96px;height:96px;border-radius:50%;overflow:hidden;margin:0 auto 10px;border:2px solid var(--ln)}
+.me .big img{width:100%;height:100%;object-fit:cover;object-position:center 10%}
+.me b{display:block;font-size:24px}
+.me span{font-size:13px;color:var(--sub)}
+.fld{background:var(--card);border-radius:14px;margin-top:14px;padding:0 14px}
+.fld>div{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--ln)}
+.fld>div:last-child{border-bottom:0}
+.fld span{font-size:13px;color:var(--sub);flex:none}
+.fld b{font-size:14px;font-weight:500;text-align:right}
+.sec{font-size:12px;color:var(--fa);margin:18px 2px 0}
+
+/* memo */
+.memos{background:#1c1a14}
+.memos .nav{background:#1c1a14}
+.memos .nav .back,.memos .nav .rt{color:#e6b422}
+.mrow{background:#2a2617;border-radius:14px;padding:13px 15px;margin-top:10px;cursor:pointer}
+.mrow b{display:block;font-size:15px;color:#f3e7bf}
+.mrow span{display:block;font-size:12px;color:#a69a72;margin-top:2px}
+.note{padding:6px 2px}
+.note .dt{font-size:12px;color:#a69a72;text-align:center;margin:6px 0 14px}
+.note h3{font-size:20px;color:#f3e7bf;margin-bottom:10px}
+.note p,.note li{font-size:15px;color:#e9dfc3;line-height:1.8}
+.note ul{list-style:none}
+.note li.done{color:#8f8668;text-decoration:line-through}
+.note li:before{content:"○ ";color:#e6b422}
+.note li.done:before{content:"● "}
+
+/* photos */
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin:8px -12px 0}
+.gal div{position:relative;aspect-ratio:1/1;display:flex;align-items:flex-end;padding:6px;font-size:11px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);cursor:pointer;overflow:hidden}
+.gal img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%}
+.gal div span{position:relative}
+#viewer{z-index:40;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#viewer img{max-width:100%;max-height:80%}
+#viewer .vc{color:#ccc;font-size:13px;margin-top:12px}
+#viewer .x{position:absolute;top:48px;left:16px;font-size:16px;color:var(--bl)}
+
+/* clock */
+.alm>div{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--ln)}
+.alm b{display:block;font-size:42px;font-weight:300;line-height:1.1}
+.alm span{display:block;font-size:13px;color:var(--sub)}
+.alm .off b,.alm .off span{color:var(--fa)}
+.tgl{flex:none;width:52px;height:31px;border-radius:16px;background:var(--gn);position:relative;transition:background .2s}
+.tgl:after{content:"";position:absolute;right:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#fff;transition:all .2s}
+.tgl.off{background:#3a3a3e}.tgl.off:after{right:23px}
+
+/* search */
+.srch{display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:12px;padding:10px 12px;color:var(--fa);margin:8px 0 10px}
+.hist>div{display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid var(--ln);font-size:15px}
+.hist i{font-style:normal;color:var(--fa)}
+.hist em{font-style:normal;margin-left:auto;font-size:12px;color:var(--fa)}
+
+/* health */
+.ring{width:150px;height:150px;border-radius:50%;margin:20px auto 10px;background:conic-gradient(var(--or) 0 80%,#2a2a2e 80% 100%);display:flex;align-items:center;justify-content:center}
+.ring div{width:118px;height:118px;border-radius:50%;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring b{font-size:30px}.ring span{font-size:12px;color:var(--sub)}
+.lift>div{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--ln)}
+.lift b{font-size:15px;font-weight:500}
+.lift span{font-size:20px;font-weight:700;color:var(--or)}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+
+<div class="sb"><span id="sbTime">21:47</span><span class="r">5G <span class="bat"><i></i></span> 12%</span></div>
+
+<!-- LOCK -->
+<div class="screen" id="lock">
+<img class="wp" data-img alt="">
+<div class="dim"></div>
+<div class="clk"><div class="d" id="lDate">10월 26일 월요일</div><div class="t" id="lTime">21:47</div></div>
+<div class="ntf">
+<div class="nt"><span class="ic" style="background:var(--yl)">💬</span><div class="bd"><div class="hd"><span>카카오톡</span><span>방금</span></div><b>공고 놈들</b><span class="m">박재민: 최강산 또 읽씹하네 이 새끼</span></div></div>
+<div class="nt"><span class="ic" style="background:var(--yl)">💬</span><div class="bd"><div class="hd"><span>카카오톡</span><span>12분 전</span></div><b>도진이 와이프</b><span class="m">강산 씨 이번 주 토요일 진짜 딱 한 번만요🙏</span></div></div>
+<div class="nt"><span class="ic" style="background:var(--gn)">📞</span><div class="bd"><div class="hd"><span>전화</span><span>1시간 전</span></div><b>엄마</b><span class="m">부재중 전화 2통</span></div></div>
+<div class="nt"><span class="ic" style="background:var(--or)">⏰</span><div class="bd"><div class="hd"><span>시계</span><span>내일</span></div><b>알람 05:50</b><span class="m">출근</span></div></div>
+</div>
+<div class="swipe">눌러서 잠금 해제</div>
+</div>
+
+<!-- PASSCODE -->
+<div class="screen hidden" id="pass">
+<div class="tt">암호 입력</div>
+<div class="hint" id="pHint"></div>
+<div class="dots" id="dots"><i></i><i></i><i></i><i></i></div>
+<div class="pad" id="pad"></div>
+<button class="cancel" id="pCancel">취소</button>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="home">
+<div class="wid">
+<div><span class="k">부산 강서구</span><span class="v">14°</span><span class="s">맑음 · 내일 아침 8°</span></div>
+<div><span class="k">걸음 수</span><span class="v">18,402</span><span class="s">거의 다 현장에서</span></div>
+</div>
+<div class="grid" id="grid"></div>
+<div class="dock">
+<button class="app" data-open="call"><span class="ico" style="background:var(--gn)">📞</span></button>
+<button class="app" data-open="kakao"><span class="ico" style="background:var(--yl)">💬</span></button>
+<button class="app" data-open="photo"><span class="ico" style="background:#8e8e93">📷</span></button>
+<button class="app" data-open="search"><span class="ico" style="background:#fff">🧭</span></button>
+</div>
+</div>
+
+<!-- views get injected here -->
+<div id="views"></div>
+
+<div class="screen hidden" id="viewer"><button class="x" id="vX">‹ 사진</button><img id="vImg" alt=""><div class="vc" id="vCap"></div></div>
+
+<div class="homebar" id="homebar"></div>
+</div>
+
+<script>
+/* ===== 여기만 바꾸면 돼 ===== */
+const IMG = "gangsan.png";   // 강산 사진 파일명 또는 이미지 링크
+const CODE = "0803";         // 잠금 비밀번호 (강산 생일)
+/* =========================== */
+
+document.querySelectorAll('[data-img]').forEach(e=>e.src=IMG);
+const $=s=>document.querySelector(s);
+
+/* clock */
+function tick(){const d=new Date();const t=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+$('#lTime').textContent=t;$('#sbTime').textContent=t;
+$('#lDate').textContent=(d.getMonth()+1)+'월 '+d.getDate()+'일 '+['일','월','화','수','목','금','토'][d.getDay()]+'요일';}
+tick();setInterval(tick,10000);
+
+/* lock & passcode */
+let entry='',tries=0;
+const pad=$('#pad');
+[['1',''],['2','ABC'],['3','DEF'],['4','GHI'],['5','JKL'],['6','MNO'],['7','PQRS'],['8','TUV'],['9','WXYZ'],['',''],['0',''],['⌫','']].forEach(([n,s])=>{
+ const b=document.createElement('button');
+ if(n===''){b.className='em';b.disabled=true}
+ else b.innerHTML=n+(s?'<small>'+s+'</small>':'');
+ b.onclick=()=>press(n);pad.appendChild(b);});
+function dots(){[...$('#dots').children].forEach((d,i)=>d.classList.toggle('on',i<entry.length))}
+function press(n){
+ if(n==='⌫'){entry=entry.slice(0,-1);dots();return}
+ if(entry.length>=4)return;entry+=n;dots();
+ if(entry.length===4){setTimeout(()=>{
+  if(entry===CODE){$('#pass').classList.add('hidden');$('#lock').classList.add('hidden');$('#home').classList.remove('hidden');}
+  else{tries++;const d=$('#dots');d.classList.add('shake');setTimeout(()=>d.classList.remove('shake'),400);
+   $('#pHint').textContent=tries>=2?'힌트: 주인 생일 (4자리)':'다시 시도';}
+  entry='';dots();},180)}
+}
+$('#lock').onclick=()=>{$('#pass').classList.remove('hidden')};
+$('#pCancel').onclick=()=>{$('#pass').classList.add('hidden');entry='';dots()};
+$('#home').classList.add('hidden');
+
+/* apps */
+const apps=[
+ ['kakao','💬','카카오톡','var(--yl)','99+'],
+ ['call','📞','전화','var(--gn)','2'],
+ ['contact','👤','연락처','#8e8e93',''],
+ ['memo','📝','메모','#ffd60a',''],
+ ['photo','🖼','사진','linear-gradient(135deg,#ff9f0a,#ff375f,#5e5ce6)',''],
+ ['clock','⏰','시계','#1c1c1e',''],
+ ['search','🔍','검색','#fff',''],
+ ['health','🏋️','운동','#000','']];
+const grid=$('#grid');
+apps.forEach(([id,ic,lb,bg,bd])=>{const b=document.createElement('button');b.className='app';b.dataset.open=id;
+ b.innerHTML=`<span class="ico" style="background:${bg};${bg==='#000'||bg==='#1c1c1e'?'border:1px solid #3a3a3e':''}">${ic}${bd?`<span class="bdg">${bd}</span>`:''}</span><span class="lb">${lb}</span>`;grid.appendChild(b)});
+
+const av=(t,c)=>`<span class="av" style="background:${c}">${t}</span>`;
+const C={jm:'#e07a3a',tw:'#4a8fd1',hs:'#7a6bd1',dj:'#3a9a6b',dw:'#c98fb3',mom:'#d98a5a',sis:'#7aa36b',job:'#8b7a5f'};
+
+const rooms={
+ crew:{t:'공고 놈들 5',msgs:[
+  ['day','오늘'],
+  ['재민',C.jm,'박재민','최강산 또 소개팅 깠다매ㅋㅋㅋ'],
+  ['태오',C.tw,'막내','형님 진짜 평생 혼자 사실 깁니까'],
+  ['현수',C.hs,'김현수','냅둬라 저 성질머리에 누가 만나 주노'],
+  ['me','닥치라'],
+  ['재민',C.jm,'박재민','ㅋㅋㅋㅋ또 성질낸다'],
+  ['태오',C.tw,'막내','형수님 생기면 제가 젤 먼저 인사드릴게예'],
+  ['도진',C.dj,'도진','토요일 나와라. 와이프 성질난다'],
+  ['현수',C.hs,'김현수','도진이 와이프한테 찍히면 끝이다 강산아'],
+  ['재민',C.jm,'박재민','최강산 또 읽씹하네 이 새끼','21:47']]},
+ dw:{t:'도진이 와이프',msgs:[
+  ['day','10월 12일'],
+  ['도',C.dw,'도진이 와이프','강산 씨 혹시 요즘 만나는 사람 있어요?'],
+  ['me','없습니다'],
+  ['도',C.dw,'도진이 와이프','그럼 제가 소개 한 번 시켜 줘도 돼요?ㅎㅎ'],
+  ['me','괜찮습니다'],
+  ['day','오늘'],
+  ['도',C.dw,'도진이 와이프','강산 씨~ 이번 주 토요일에 시간 돼요?'],
+  ['도',C.dw,'도진이 와이프','제 회사 후배인데 진짜 괜찮은 사람이에요. 사진 보내 줄까요?'],
+  ['me','됐습니다'],
+  ['도',C.dw,'도진이 와이프','아 왜요ㅠㅠ 밥만 한 번 먹어요. 도진 씨한테도 말해 놨어요'],
+  ['도',C.dw,'도진이 와이프','강산 씨 이번 주 토요일 진짜 딱 한 번만요🙏','unread']]},
+ mom:{t:'엄마',msgs:[
+  ['day','어제'],
+  ['엄',C.mom,'엄마','밥은 묵었나'],
+  ['me','어'],
+  ['엄',C.mom,'엄마','주말에 집에 온나 고기 사 놨다'],
+  ['엄',C.mom,'엄마','니 누나는 시집도 가고 애도 낳았는데 니는 우짤라고'],
+  ['me','바쁘다'],
+  ['엄',C.mom,'엄마','바쁘기는 개뿔'],
+  ['day','오늘'],
+  ['엄',C.mom,'엄마','전화 좀 받아라','unread']]},
+ sis:{t:'누나',msgs:[
+  ['day','어제'],
+  ['누',C.sis,'누나','photo:조카'],
+  ['누',C.sis,'누나','조카가 삼촌 보고 싶단다'],
+  ['me','주말에 간다'],
+  ['누',C.sis,'누나','과자 사 와라. 저번처럼 한 박스 말고'],
+  ['me','한 박스가 뭐 어때서'],
+  ['누',C.sis,'누나','그리고 메모 보냈제? 좀 읽어라']]},
+ job:{t:'강서 3팀 작업 공지',msgs:[
+  ['day','오늘'],
+  ['공',C.job,'공장장','내일 크레인 7시 반 들어옵니다'],
+  ['공',C.job,'공장장','최 반장 B동 용접 검사 오전 중으로 부탁해'],
+  ['me','네'],
+  ['후',C.job,'김주임','반장님 저 내일 10분 늦습니다 죄송합니다'],
+  ['me','늦으면 죽는다']]}
+};
+
+function roomHTML(r){let h='';r.msgs.forEach(m=>{
+ if(m[0]==='day'){h+=`<div class="day"><span>${m[1]}</span></div>`;return}
+ if(m[0]==='me'){h+=`<div class="cm me"><span class="tm">${m[2]||''}</span><span class="b">${m[1]}</span></div>`;return}
+ const [a,c,n,t,x]=m;const body=t.startsWith('photo:')?`<div class="ph">${t.slice(6)}</div>`:`<span class="b">${t}</span>`;
+ h+=`<div class="cm"><span class="a" style="background:${c}">${a}</span><div><span class="n">${n}</span>${body}</div><span class="tm">${x==='unread'?'<i>1</i>':''}${x&&x!=='unread'?x:''}</span></div>`;});return h}
+
+const views={
+ kakao:{t:'채팅',rt:'안 읽음 117',body:`
+  <div class="row" data-room="crew">${av('공고','#6a7a8c')}<div class="c"><b>공고 놈들 5</b><span>박재민: 최강산 또 읽씹하네 이 새끼</span></div><div class="rt">21:47<br><i>99+</i></div></div>
+  <div class="row" data-room="dw">${av('도진',C.dw)}<div class="c"><b>도진이 와이프</b><span>강산 씨 이번 주 토요일 진짜 딱 한 번만요🙏</span></div><div class="rt">21:35<br><i>3</i></div></div>
+  <div class="row" data-room="job">${av('현장',C.job)}<div class="c"><b>강서 3팀 작업 공지</b><span>반장님 저 내일 10분 늦습니다 죄송합니다</span></div><div class="rt">18:02<br><i>14</i></div></div>
+  <div class="row" data-room="mom">${av('엄마',C.mom)}<div class="c"><b>엄마</b><span>전화 좀 받아라</span></div><div class="rt">20:40<br><i>1</i></div></div>
+  <div class="row" data-room="sis">${av('누나',C.sis)}<div class="c"><b>누나</b><span>그리고 메모 보냈제? 좀 읽어라</span></div><div class="rt">어제</div></div>`},
+ call:{t:'최근 기록',rt:'편집',body:`
+  <div class="row">${av('엄',C.mom)}<div class="c"><b class="miss">엄마 (2)</b><span>부재중</span></div><div class="rt">20:41</div></div>
+  <div class="row">${av('재',C.jm)}<div class="c"><b>박재민 개새끼</b><span>발신 · 14분</span></div><div class="rt">19:55</div></div>
+  <div class="row">${av('공',C.job)}<div class="c"><b>공장장님</b><span>수신 · 3분</span></div><div class="rt">17:20</div></div>
+  <div class="row">${av('도',C.dj)}<div class="c"><b>도진</b><span>수신 · 1분</span></div><div class="rt">어제</div></div>
+  <div class="row">${av('?','#555')}<div class="c"><b>010-****-2814</b><span>거절함</span></div><div class="rt">어제</div></div>
+  <div class="row">${av('막',C.tw)}<div class="c"><b>막내</b><span>발신 · 0분 12초</span></div><div class="rt">10.24</div></div>
+  <div class="row">${av('엄',C.mom)}<div class="c"><b>엄마</b><span>수신 · 0분 48초</span></div><div class="rt">10.23</div></div>`},
+ contact:{t:'연락처',rt:'편집',body:`
+  <div class="me"><div class="big"><img data-img alt=""></div><b>최강산</b><span>내 카드</span></div>
+  <div class="fld">
+   <div><span>생일</span><b>8월 3일</b></div>
+   <div><span>회사</span><b>강서 ○○철골 · 제작팀</b></div>
+   <div><span>메모</span><b>192 / 안전화 290</b></div>
+   <div><span>차량</span><b>검정 SUV</b></div></div>
+  <div class="sec">즐겨찾기</div>
+  <div class="fld"><div><span>엄마</span><b>📞</b></div><div><span>누나</span><b>📞</b></div><div><span>도진</span><b>📞</b></div><div><span>박재민 개새끼</span><b>📞</b></div></div>
+  <div class="sec">연락처 112</div>
+  <div class="fld"><div><span>공장장님</span><b></b></div><div><span>김현수 (돈 계산)</span><b></b></div><div><span>도진이 와이프</span><b></b></div><div><span>막내</span><b></b></div><div><span>보일러 아저씨</span><b></b></div></div>
+  <div class="sec">차단한 연락처 3</div>`},
+ memo:{cls:'memos',t:'메모',rt:'편집',body:`
+  <div class="mrow" data-note="nag"><b>니 이거 좀 고쳐라</b><span>3월 12일 · 누나가 보낸 거</span></div>
+  <div class="mrow" data-note="shop"><b>장보기</b><span>오늘 · 삼겹 두 근, 맥주…</span></div>
+  <div class="mrow" data-note="hs"><b>현수한테 물어볼 거</b><span>1월 30일</span></div>`},
+ photo:{t:'최근 항목',rt:'선택',body:`<div class="gal" id="gal"></div>`},
+ clock:{t:'알람',rt:'+',body:`<div class="alm">
+  <div><div><b>05:50</b><span>출근</span></div><button class="tgl"></button></div>
+  <div><div><b>05:55</b><span>출근 2</span></div><button class="tgl"></button></div>
+  <div><div><b>06:00</b><span>진짜 일어나라</span></div><button class="tgl"></button></div>
+  <div class="off"><div><b>09:00</b><span>일요일 헬스</span></div><button class="tgl off"></button></div></div>`},
+ search:{t:'최근 검색',rt:'전체 삭제',body:`<div class="srch">🔍 검색어 입력</div><div class="hist">
+  <div><i>⌕</i>용접 마스크 자동차광 추천<em>오늘</em></div>
+  <div><i>⌕</i>강서구 고깃집 늦게까지<em>오늘</em></div>
+  <div><i>⌕</i>소개팅 안 나가는 법<em>어제</em></div>
+  <div><i>⌕</i>캠핑 화로대 무거운 거<em>어제</em></div>
+  <div><i>⌕</i>세 살 조카 선물<em>10.22</em></div>
+  <div><i>⌕</i>과자 한 박스 많나<em>10.22</em></div>
+  <div><i>⌕</i>벤치프레스 140 정체기<em>10.20</em></div>
+  <div><i>⌕</i>허리 찜질 언제까지<em>10.18</em></div>
+  <div><i>⌕</i>화날 때 참는 법<em>9.30</em></div></div>`},
+ health:{t:'운동',rt:'이번 주',body:`<div class="ring"><div><b>3/4</b><span>이번 주 운동</span></div></div>
+  <div class="lift"><div><b>벤치프레스</b><span>135kg</span></div><div><b>데드리프트</b><span>210kg</span></div><div><b>스쿼트</b><span>180kg</span></div><div><b>체중</b><span>98kg</span></div><div><b>마지막 운동</b><span style="color:var(--sub);font-size:14px">어제 21:10</span></div></div>`}
+};
+
+const notes={
+ nag:`<div class="note"><div class="dt">3월 12일 오후 11:02</div><h3>니 이거 좀 고쳐라</h3><ul>
+  <li>말 좀 곱게 해라. 욕 좀 그만</li><li>고집 좀 그만 부려라</li><li>고맙다 미안하다 소리 좀 하고 살아라</li>
+  <li>화나면 일단 입 다물고 밖에 나갔다 와라</li><li>표정 좀 풀어라. 다들 니 화난 줄 안다</li>
+  <li>엄마 전화 좀 받아라</li><li>연애 좀 해라 제발</li></ul></div>`,
+ shop:`<div class="note"><div class="dt">오늘 오후 6:40</div><h3>장보기</h3><ul>
+  <li class="done">삼겹 두 근</li><li class="done">맥주</li><li>계란</li><li>휴지</li><li>조카 과자 (한 박스 X)</li></ul></div>`,
+ hs:`<div class="note"><div class="dt">1월 30일 오후 9:15</div><h3>현수한테 물어볼 거</h3><p>연말정산 서류 뭐 떼야 되노<br>적금 이자 이거 맞나</p></div>`
+};
+
+const photos=[[null,'실수로 찍힘'],['#5b5f66,#2c2f34','B동 용접 부위'],['#6a3a22,#2a1a12','불판'],['#4b5d3a,#1f2a18','캠핑 장작'],['#7a5c45,#3a2a1f','보일러 부품'],['#e8cfa9,#b98a5e','조카'],['#3a3f48,#1b1d22','헬스장 기록판'],['#1d2a40,#0d1320','밤 드라이브'],['#5b5f66,#2c2f34','작업 지시서'],['#2f3a2a,#141a12','풋살장'],['#6a3a22,#2a1a12','불판 2'],['#3a3f48,#1b1d22','안전화 사이즈']];
+
+const vwrap=$('#views');let stack=[];
+function makeView(html,cls,title,rt){const v=document.createElement('div');v.className='screen view '+(cls||'');
+ v.innerHTML=`<div class="nav"><button class="back">‹</button><b>${title}</b><span class="rt">${rt||''}</span></div><div class="body">${html}</div>`;
+ vwrap.appendChild(v);requestAnimationFrame(()=>requestAnimationFrame(()=>v.classList.add('open')));
+ v.querySelector('.back').onclick=()=>closeTop();stack.push(v);
+ v.querySelectorAll('[data-img]').forEach(e=>e.src=IMG);return v}
+function closeTop(){const v=stack.pop();if(!v)return;v.classList.remove('open');setTimeout(()=>v.remove(),450)}
+function goHome(){while(stack.length)closeTop();$('#viewer').classList.add('hidden')}
+
+function openApp(id){const a=views[id];const v=makeView(a.body,a.cls,a.t,a.rt);
+ if(id==='kakao')v.querySelectorAll('[data-room]').forEach(r=>r.onclick=()=>{const R=rooms[r.dataset.room];
+   const cv=makeView(roomHTML(R),'chat',R.t,'');const inp=document.createElement('div');inp.className='inp';inp.innerHTML='＋<div>메시지 입력</div>#';cv.appendChild(inp);
+   const b=cv.querySelector('.body');b.scrollTop=b.scrollHeight});
+ if(id==='memo')v.querySelectorAll('[data-note]').forEach(r=>r.onclick=()=>makeView(notes[r.dataset.note],'memos','메모',''));
+ if(id==='photo'){const g=v.querySelector('#gal');photos.forEach(([c,cap])=>{const d=document.createElement('div');
+   if(c)d.style.background=`linear-gradient(160deg,${c})`;else{const im=document.createElement('img');im.src=IMG;d.appendChild(im)}
+   d.insertAdjacentHTML('beforeend',`<span>${cap}</span>`);d.onclick=()=>{if(!c){$('#vImg').src=IMG;$('#vImg').style.display='';}else{$('#vImg').style.display='none'}$('#vCap').textContent=cap+(c?' (사진)':'');$('#viewer').classList.remove('hidden')};g.appendChild(d)})}
+ if(id==='clock')v.querySelectorAll('.tgl').forEach(t=>t.onclick=()=>{t.classList.toggle('off');t.parentElement.classList.toggle('off',t.classList.contains('off'))});
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-open]');if(b)openApp(b.dataset.open)});
+$('#vX').onclick=()=>$('#viewer').classList.add('hidden');
+$('#homebar').onclick=goHome;
+</script>
+</body>
+</html>
